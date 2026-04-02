@@ -1,12 +1,23 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { firebaseConfig } from "./config.js";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-// Initialize Firebase
+// Initialize
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-
 export const auth = getAuth(app);
+
+// Provider
+const provider = new GoogleAuthProvider();
+
+// Google Login
+export function googleLogin() {
+    signInWithPopup(auth, provider)
+        .then((result) => {
+            console.log("Google user: ", result.user);
+        })
+        .catch((error) => {
+            console.error(error);
+        })
+}
+console.log("Firebase connected 🚀");

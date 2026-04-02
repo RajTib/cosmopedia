@@ -15,17 +15,18 @@
   <link rel="stylesheet" href="styles/main.css">
 
   <!-- Favicon via emoji (quick inline SVG) -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪐</text></svg>">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪐</text></svg>">
 </head>
 
 <body>
   <!-- ═══════════════════════════════════════════════════
-       STARS CANVAS
+      STARS CANVAS
   ═══════════════════════════════════════════════════ -->
   <canvas id="starsCanvas" aria-hidden="true"></canvas>
 
   <!-- ═══════════════════════════════════════════════════
-       APP SHELL
+      APP SHELL
   ═══════════════════════════════════════════════════ -->
   <div id="app">
 
@@ -40,14 +41,18 @@
       <div class="navbar__links">
         <button class="nav-link" data-route="/" onclick="window.router?.navigate('/')">Home</button>
         <button class="nav-link" data-route="/explore" onclick="window.router?.navigate('/explore')">Explore</button>
-        <button class="nav-link" data-route="/solar-system" onclick="window.router?.navigate('/solar-system')">Solar System</button>
+        <button class="nav-link" data-route="/solar-system" onclick="window.router?.navigate('/solar-system')">Solar
+          System</button>
         <button class="nav-link" data-route="/compare" onclick="window.router?.navigate('/compare')">Compare</button>
-        <button class="nav-link" data-route="/favorites" onclick="window.router?.navigate('/favorites')">★ Favorites</button>
+        <button class="nav-link" data-route="/favorites" onclick="window.router?.navigate('/favorites')">★
+          Favorites</button>
+        <button class="nav-link" id="googleLoginBtn">Login with Google</button>
       </div>
 
       <!-- Actions -->
       <div class="navbar__actions">
-        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle light/dark theme">
+        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle theme"
+          aria-label="Toggle light/dark theme">
           ☀️
         </button>
         <button class="navbar__hamburger" id="hamburger" aria-label="Toggle mobile menu">☰</button>
@@ -84,7 +89,7 @@
   </div>
 
   <!-- ═══════════════════════════════════════════════════
-       SCRIPTS (ES Modules)
+      SCRIPTS (ES Modules)
   ═══════════════════════════════════════════════════ -->
   <script type="module" src="scripts/app.js"></script>
 </body>

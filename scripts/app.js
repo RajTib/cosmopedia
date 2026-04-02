@@ -6,8 +6,11 @@
 import { Router } from './utils/router.js';
 import { Stars } from './components/Stars.js';
 import { storage } from './utils/storage.js';
-import { auth } from './utils/firebase.js';
-import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+// 🔐 Firebase
+import { auth, googleLogin } from './utils/firebase.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
 import {
   renderHome,
   renderPlanetPage,
@@ -17,11 +20,8 @@ import {
   renderExplorePage
 } from './components/pages.js';
 
-
-
 // ─── GLOBAL STATE ─────────────────────────────────────────────────────────────
 let starsInstance = null;
-let activeAudioPlayer = null;
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
@@ -29,7 +29,34 @@ document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   initNavbar();
   initRouter();
+  initAuth(); // 🔥 NEW
 });
+
+// ─── AUTH ─────────────────────────────────────────────────────────────────────
+function initAuth() {
+  const loginBtn = document.getElementById("googleLoginBtn");
+
+  // 👇 Button click → Google login
+  loginBtn?.addEventListener("click", googleLogin);
+
+  // 👇 Listen to auth state
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      console.log("User logged in:", user);
+
+      if (loginBtn) {
+        loginBtn.textContent = user.displayName || "👤 Logged In";
+      }
+
+    } else {
+      console.log("No user");
+
+      if (loginBtn) {
+        loginBtn.textContent = "🔐 Login";
+      }
+    }
+  });
+}
 
 // ─── STARS BACKGROUND ─────────────────────────────────────────────────────────
 function initStars() {
@@ -101,7 +128,6 @@ function initRouter() {
     .on('/explore', () => renderPage(renderExplorePage()))
     .on('/solar-system', () => renderPage(renderSolarSystemPage(router)))
     .on('/compare', () => {
-      // Parse preselect from hash query string
       const hash = window.location.hash;
       const match = hash.match(/\?a=([a-z]+)/);
       const preselect = match ? match[1] : null;
@@ -114,13 +140,13 @@ function initRouter() {
 
 // ─── PAGE RENDERING ───────────────────────────────────────────────────────────
 function renderPage({ html, init }) {
-  // Clean up previous audio
+  // Cleanup audio
   if (window._currentAudioPlayer) {
     window._currentAudioPlayer.destroy?.();
     window._currentAudioPlayer = null;
   }
 
-  // Stop previous solar system
+  // Cleanup solar system
   if (window._solarSystem) {
     window._solarSystem.stop?.();
     window._solarSystem = null;
@@ -131,46 +157,35 @@ function renderPage({ html, init }) {
 
   content.innerHTML = html;
 
-  // Scroll to top on navigation
   window.scrollTo({ top: 0, behavior: 'instant' });
 
-  // Run page-specific initializer
   if (typeof init === 'function') {
-    // Small delay so DOM is fully painted
     requestAnimationFrame(() => init());
   }
 }
 
-// ─── GLOBAL HELPERS (called from inline HTML handlers) ────────────────────────
-
-/**
- * Toggle favorite from planet card
- */
+// ─── GLOBAL HELPERS ───────────────────────────────────────────────────────────
 window.toggleFav = function (planetId, btn) {
   const added = storage.toggleFavorite(planetId);
   btn.textContent = added ? '★' : '☆';
   btn.classList.toggle('is-fav', added);
 
-  // Show toast
   showToast(added ? `⭐ ${planetId} added to favorites` : `${planetId} removed from favorites`);
 };
 
-/**
- * Toggle favorite from planet hero page
- */
 window.toggleFavHero = function (planetId) {
   const added = storage.toggleFavorite(planetId);
   const btn = document.getElementById('favBtnHero');
+
   if (btn) {
     btn.textContent = added ? '★ Favorited' : '☆ Add to Favorites';
     btn.classList.toggle('is-fav', added);
   }
+
   showToast(added ? `⭐ ${planetId} added to favorites` : `${planetId} removed from favorites`);
 };
 
-/**
- * Toast notification
- */
+// ─── TOAST ────────────────────────────────────────────────────────────────────
 function showToast(message) {
   const existing = document.getElementById('toast');
   if (existing) existing.remove();
@@ -196,6 +211,7 @@ function showToast(message) {
     opacity: 0;
     backdrop-filter: blur(20px);
   `;
+
   toast.textContent = message;
   document.body.appendChild(toast);
 
@@ -210,16 +226,3 @@ function showToast(message) {
     setTimeout(() => toast.remove(), 300);
   }, 2500);
 }
-
-// --- Log In ------------------------------------------------------------------------
-async function login(email, password) {
-  try {
-    const userCred = await signInWithEmailAndPassword(auth, email, password);
-    console.log("Logged in:", userCred.user);
-  } catch (err) {
-    console.error("Error:", err.message);
-  }
-}
-
-// 👇 TEMP TEST CALL (put this at the bottom)
-login("test@test.com", "123456");
