@@ -6,6 +6,8 @@
 import { Router } from './utils/router.js';
 import { Stars } from './components/Stars.js';
 import { storage } from './utils/storage.js';
+import { auth } from './utils/firebase.js';
+import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
   renderHome,
   renderPlanetPage,
@@ -14,6 +16,8 @@ import {
   renderFavoritesPage,
   renderExplorePage
 } from './components/pages.js';
+
+
 
 // ─── GLOBAL STATE ─────────────────────────────────────────────────────────────
 let starsInstance = null;
@@ -206,3 +210,16 @@ function showToast(message) {
     setTimeout(() => toast.remove(), 300);
   }, 2500);
 }
+
+// --- Log In ------------------------------------------------------------------------
+async function login(email, password) {
+  try {
+    const userCred = await signInWithEmailAndPassword(auth, email, password);
+    console.log("Logged in:", userCred.user);
+  } catch (err) {
+    console.error("Error:", err.message);
+  }
+}
+
+// 👇 TEMP TEST CALL (put this at the bottom)
+login("test@test.com", "123456");
