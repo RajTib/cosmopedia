@@ -197,7 +197,15 @@ window.toggleFav = async function (planetId, btn) {
   await saveFavorites(user.uid, favs);
 };
 
-window.toggleFavHero = function (planetId) {
+window.toggleFavHero = async function (planetId) {
+  const user = auth.currentUser;
+
+  // 🚨 BLOCK
+  if (!user) {
+    alert("Login required to favorite planets 🚀");
+    return;
+  }
+
   const added = storage.toggleFavorite(planetId);
   const btn = document.getElementById('favBtnHero');
 
@@ -206,7 +214,8 @@ window.toggleFavHero = function (planetId) {
     btn.classList.toggle('is-fav', added);
   }
 
-  showToast(added ? `⭐ ${planetId} added to favorites` : `${planetId} removed from favorites`);
+  const favs = storage.getFavorites();
+  await saveFavorites(user.uid, favs);
 };
 
 // ─── TOAST ────────────────────────────────────────────────────────────────────
