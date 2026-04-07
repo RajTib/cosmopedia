@@ -180,17 +180,21 @@ function renderPage({ html, init }) {
 
 // ─── GLOBAL HELPERS ───────────────────────────────────────────────────────────
 window.toggleFav = async function (planetId, btn) {
+  const user = auth.currentUser;
+
+  // 🚨 BLOCK if not logged in
+  if (!user) {
+    alert("Login required to favorite planets 🚀");
+    return;
+  }
+
   const added = storage.toggleFavorite(planetId);
 
   btn.textContent = added ? '★' : '☆';
   btn.classList.toggle('is-fav', added);
 
-  const user = auth.currentUser;
-
-  if (user) {
-    const favs = storage.getFavorites();
-    await saveFavorites(user.uid, favs);
-  }
+  const favs = storage.getFavorites();
+  await saveFavorites(user.uid, favs);
 };
 
 window.toggleFavHero = function (planetId) {
