@@ -18,6 +18,10 @@ export const storage = {
     } catch { return []; }
   },
 
+  setFavorites(favs) {
+    localStorage.setItem(KEYS.FAVORITES, JSON.stringify(favs));
+  },
+
   toggleFavorite(planetId) {
     const favs = this.getFavorites();
     const idx = favs.indexOf(planetId);

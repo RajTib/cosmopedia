@@ -50,6 +50,7 @@ function initAuth() {
       // LOAD FAVORITES HERE
       const favs = await loadFavorites(user.uid);
       storage.setFavorites(favs);
+      document.dispatchEvent(new Event("favoritesUpdated"));
       console.log("Loaded favorites:", favs);
 
     } else {
@@ -178,12 +179,18 @@ function renderPage({ html, init }) {
 }
 
 // ─── GLOBAL HELPERS ───────────────────────────────────────────────────────────
-window.toggleFav = function (planetId, btn) {
+window.toggleFav = async function (planetId, btn) {
   const added = storage.toggleFavorite(planetId);
+
   btn.textContent = added ? '★' : '☆';
   btn.classList.toggle('is-fav', added);
 
-  showToast(added ? `⭐ ${planetId} added to favorites` : `${planetId} removed from favorites`);
+  const user = auth.currentUser;
+
+  if (user) {
+    const favs = storage.getFavorites();
+    await saveFavorites(user.uid, favs);
+  }
 };
 
 window.toggleFavHero = function (planetId) {
@@ -239,17 +246,3 @@ function showToast(message) {
     setTimeout(() => toast.remove(), 300);
   }, 2500);
 }
-
-window.toggleFav = async function (planetId, btn) {
-  const added = storage.toggleFavorite(planetId);
-
-  btn.textContent = added ? '★' : '☆';
-  btn.classList.toggle('is-fav', added);
-
-  const user = auth.currentUser;
-
-  if (user) {
-    const favs = storage.getFavorites();
-    await saveFavorites(user.uid, favs);
-  }
-};
