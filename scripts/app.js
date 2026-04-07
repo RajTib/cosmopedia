@@ -8,7 +8,7 @@ import { Stars } from './components/Stars.js';
 import { storage } from './utils/storage.js';
 
 // 🔐 Firebase
-import { auth, googleLogin } from './utils/firebase.js';
+import { auth, googleLogin, saveFavorites, loadFavorites } from './utils/firebase.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
@@ -37,23 +37,25 @@ document.addEventListener('DOMContentLoaded', () => {
 function initAuth() {
   const loginBtn = document.getElementById("googleLoginBtn");
 
-  onAuthStateChanged(auth, (user) => {
+  onAuthStateChanged(auth, async (user) => {
+
     if (!loginBtn) return;
 
     if (user) {
       console.log("User logged in:", user);
 
       loginBtn.textContent = user.displayName || "👤 Profile";
-
-      // 👉 change button to logout
       loginBtn.onclick = logout;
+
+      // LOAD FAVORITES HERE
+      const favs = await loadFavorites(user.uid);
+      storage.setFavorites(favs);
+      console.log("Loaded favorites:", favs);
 
     } else {
       console.log("No user");
 
       loginBtn.textContent = "🔐 Login with Google";
-
-      // 👉 change button to login
       loginBtn.onclick = googleLogin;
     }
   });
@@ -237,3 +239,17 @@ function showToast(message) {
     setTimeout(() => toast.remove(), 300);
   }, 2500);
 }
+
+window.toggleFav = async function (planetId, btn) {
+  const added = storage.toggleFavorite(planetId);
+
+  btn.textContent = added ? '★' : '☆';
+  btn.classList.toggle('is-fav', added);
+
+  const user = auth.currentUser;
+
+  if (user) {
+    const favs = storage.getFavorites();
+    await saveFavorites(user.uid, favs);
+  }
+};
