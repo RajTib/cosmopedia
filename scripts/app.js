@@ -10,6 +10,7 @@ import { storage } from './utils/storage.js';
 // 🔐 Firebase
 import { auth, googleLogin } from './utils/firebase.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 import {
   renderHome,
@@ -36,26 +37,36 @@ document.addEventListener('DOMContentLoaded', () => {
 function initAuth() {
   const loginBtn = document.getElementById("googleLoginBtn");
 
-  // 👇 Button click → Google login
-  loginBtn?.addEventListener("click", googleLogin);
-
-  // 👇 Listen to auth state
   onAuthStateChanged(auth, (user) => {
+    if (!loginBtn) return;
+
     if (user) {
       console.log("User logged in:", user);
 
-      if (loginBtn) {
-        loginBtn.textContent = user.displayName || "👤 Logged In";
-      }
+      loginBtn.textContent = user.displayName || "👤 Profile";
+
+      // 👉 change button to logout
+      loginBtn.onclick = logout;
 
     } else {
       console.log("No user");
 
-      if (loginBtn) {
-        loginBtn.textContent = "🔐 Login";
-      }
+      loginBtn.textContent = "🔐 Login with Google";
+
+      // 👉 change button to login
+      loginBtn.onclick = googleLogin;
     }
   });
+}
+
+function logout() {
+  signOut(auth)
+    .then(() => {
+      console.log("Logged out");
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 }
 
 // ─── STARS BACKGROUND ─────────────────────────────────────────────────────────
