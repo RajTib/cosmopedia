@@ -109,15 +109,3 @@ This project was developed as part of a web programming exercise to demonstrate:
 * 🌌 Interactive solar system visualization
 * 📊 Planet comparison tool
 * 🔗 API integration (e.g., NASA data)
-
----
-
-## 👨‍💻 Author
-
-Developed as part of a web programming project.
-
----
-
-## 🌠 Final Note
-
-Cosmopedia is a foundational project that can be expanded into a full-scale interactive and collaborative platform for space knowledge.
